@@ -1,0 +1,188 @@
+#include <iostream>
+#include <string>
+#include <vector>
+
+using namespace std;
+
+enum TokenType {
+    IDENTIFICADOR = 0,
+    ENTERO = 1,
+    REAL = 2,
+    CADENA = 3,
+    TIPO = 4,
+    OPSUMA = 5,
+    OPMUL = 6,
+    OPRELAC = 7,
+    OPOR = 8,
+    OPAND = 9,
+    OPNOT = 10,
+    OPIGUALDAD = 11,
+    PUNTOYCOMA = 12,
+    COMA = 13,
+    PARENTESIS_ABIERTO = 14,
+    PARENTESIS_CERRADO = 15,
+    LLAVE_ABIERTA = 16,
+    LLAVE_CERRADA = 17,
+    ASIGNACION = 18,
+    IF = 19,
+    WHILE = 20,
+    RETURN = 21,
+    ELSE = 22,
+    FIN_DE_ARCHIVO = 23
+};
+
+struct Token {
+    TokenType type;
+    string lexema;
+};
+
+class LexicalAnalyzer {
+public:
+    LexicalAnalyzer(const string& input) : input(input), currentPosition(0) {}
+
+    Token getNextToken() {
+        Token token;
+        skipWhitespaces();
+
+        if (currentPosition >= input.size()) {
+            token.type = FIN_DE_ARCHIVO;
+            return token;
+        }
+
+        char currentChar = input[currentPosition];
+        token.lexema += currentChar;
+        currentPosition++;
+
+        if (isalpha(currentChar)) {
+            token.type = processIdentifier(token);
+        } else if (isdigit(currentChar)) {
+            token.type = processNumber(token);
+        } else if (currentChar == '+') {
+            token.type = OPSUMA;
+        } else if (currentChar == '-') {
+            token.type = OPSUMA;
+        } else if (currentChar == '*') {
+            token.type = OPMUL;
+        } else if (currentChar == '/') {
+            token.type = OPMUL;
+        } else if (currentChar == '<' || currentChar == '>' || currentChar == '=') {
+            token.type = processRelationalOperator(token);
+        } else if (currentChar == '&') {
+            token.type = processAndOperator(token);
+        } else if (currentChar == '|') {
+            token.type = processOrOperator(token);
+        } else if (currentChar == '!') {
+            token.type = OPNOT;
+        } else if (currentChar == ';') {
+            token.type = PUNTOYCOMA;
+        } else if (currentChar == ',') {
+            token.type = COMA;
+        } else if (currentChar == '(') {
+            token.type = PARENTESIS_ABIERTO;
+        } else if (currentChar == ')') {
+            token.type = PARENTESIS_CERRADO;
+        } else if (currentChar == '{') {
+            token.type = LLAVE_ABIERTA;
+        } else if (currentChar == '}') {
+            token.type = LLAVE_CERRADA;
+        } else if (currentChar == '=') {
+            token.type = ASIGNACION;
+        } else {
+            // Invalid character
+            token.type = FIN_DE_ARCHIVO;
+        }
+
+        return token;
+    }
+
+private:
+    const string& input;
+    size_t currentPosition;
+
+    void skipWhitespaces() {
+        while (currentPosition < input.size() && isspace(input[currentPosition])) {
+            currentPosition++;
+        }
+    }
+
+    TokenType processIdentifier(Token& token) {
+        while (currentPosition < input.size() && (isalnum(input[currentPosition]) || input[currentPosition] == '_')) {
+            token.lexema += input[currentPosition];
+            currentPosition++;
+        }
+
+        if (token.lexema == "if") {
+            return IF;
+        } else if (token.lexema == "while") {
+            return WHILE;
+        } else if (token.lexema == "return") {
+            return RETURN;
+        } else if (token.lexema == "else") {
+            return ELSE;
+        } else if (token.lexema == "int" || token.lexema == "float" || token.lexema == "void") {
+            return TIPO;
+        } else {
+            return IDENTIFICADOR;
+        }
+    }
+
+    TokenType processNumber(Token& token) {
+        while (currentPosition < input.size() && (isdigit(input[currentPosition]) || input[currentPosition] == '.')) {
+            token.lexema += input[currentPosition];
+            currentPosition++;
+        }
+
+        if (token.lexema.find('.') != string::npos) {
+            return REAL;
+        } else {
+            return ENTERO;
+        }
+    }
+
+    TokenType processRelationalOperator(Token& token) {
+        if (currentPosition < input.size() && input[currentPosition] == '=') {
+            token.lexema += '=';
+            currentPosition++;
+        }
+
+        return OPRELAC;
+    }
+
+    TokenType processAndOperator(Token& token) {
+        if (currentPosition < input.size() && input[currentPosition] == '&') {
+            token.lexema += '&';
+            currentPosition++;
+            return OPAND;
+        }
+
+        // Invalid character after '&'
+        return FIN_DE_ARCHIVO;
+    }
+
+    TokenType processOrOperator(Token& token) {
+        if (currentPosition < input.size() && input[currentPosition] == '|') {
+            token.lexema += '|';
+            currentPosition++;
+            return OPOR;
+        }
+
+        // Invalid character after '|'
+        return FIN_DE_ARCHIVO;
+    }
+};
+
+int main() {
+    cout << "Ingrese el programa: ";
+    string input;
+    getline(cin, input);
+
+    LexicalAnalyzer lexer(input);
+
+    Token token;
+    do {
+        token = lexer.getNextToken();
+        cout << "Tipo: " << token.type << "\t\tLexema: " << token.lexema << endl;
+    } while (token.type != FIN_DE_ARCHIVO);
+
+    return 0;
+}
