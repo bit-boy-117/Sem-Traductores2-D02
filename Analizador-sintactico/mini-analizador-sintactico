@@ -1,0 +1,83 @@
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+class Pila {
+public:
+    void push(int elemento) {
+        // Simula la operación push
+        cout << "Push: " << elemento << endl;
+    }
+
+    int pop() {
+        // Simula la operación pop
+        cout << "Pop" << endl;
+        return 0; // Se devuelve un valor predeterminado
+    }
+
+    void muestra() {
+        // Simula la operación muestra
+        cout << "Muestra" << endl;
+    }
+
+    int top() {
+        // Simula la operación top
+        cout << "Top" << endl;
+        return 0; // Se devuelve un valor predeterminado
+    }
+};
+
+class Lexico {
+public:
+    string cadena;
+    char simbolo;
+    int posicion;
+
+    Lexico(string entrada) : cadena(entrada), posicion(0) {}
+
+    void sigSimbolo() {
+        if (posicion < cadena.length()) {
+            simbolo = cadena[posicion++];
+        }
+    }
+
+    bool terminado() {
+        return posicion >= cadena.length();
+    }
+};
+
+void ejemplo1(Pila &pila) {
+    // Ejemplo 1: Operaciones con una pila
+    pila.push(2);
+    pila.push(3);
+    pila.push(4);
+    pila.push(5);
+    pila.muestra();
+
+    cout << pila.top() << endl;
+    cout << pila.top() << endl;
+
+    cout << pila.pop() << endl;
+    cout << pila.pop() << endl;
+}
+
+void ejemplo2(Lexico &lexico) {
+    // Ejemplo 2: Operaciones con un objeto Lexico
+    while (!lexico.terminado()) {
+        lexico.sigSimbolo();
+        cout << lexico.simbolo << endl;
+    }
+}
+
+int main() {
+    // Crear objetos Pila y Lexico
+    Pila pila;
+    Lexico lexico("+-+");
+
+    // Ejecutar los ejemplos
+    ejemplo1(pila);
+    ejemplo2(lexico);
+
+    return 0;
+}
