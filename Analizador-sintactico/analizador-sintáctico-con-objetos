@@ -1,0 +1,126 @@
+#include <iostream>
+#include <list>
+#include <string>
+
+using namespace std;
+
+class ElementoPila {
+public:
+    virtual ~ElementoPila() {}
+    virtual void muestra() const = 0;
+};
+
+class Alumno : public ElementoPila {
+protected:
+    string codigo;
+public:
+    virtual void muestra() const {}
+};
+
+class Bachillerato : public Alumno {
+protected:
+    string preparatoria;
+public:
+    Bachillerato(string codigo, string preparatoria) {
+        this->codigo = codigo;
+        this->preparatoria = preparatoria;
+    }
+    void muestra() const override {
+        cout << "Alumno Bachillerato" << endl;
+        cout << "Codigo: " << codigo << endl;
+        cout << "Preparatoria: " << preparatoria << endl << endl;
+    }
+};
+
+class Licenciatura : public Alumno {
+protected:
+    string carrera;
+    int creditos;
+public:
+    Licenciatura(string codigo, string carrera, int creditos) {
+        this->codigo = codigo;
+        this->carrera = carrera;
+        this->creditos = creditos;
+    }
+    void muestra() const override {
+        cout << "Alumno Licenciatura" << endl;
+        cout << "Codigo: " << codigo << endl;
+        cout << "Carrera: " << carrera << endl;
+        cout << "Creditos: " << creditos << endl << endl;
+    }
+};
+
+class Pila {
+private:
+    list<ElementoPila*> lista;
+public:
+    void push(ElementoPila* x) {
+        lista.push_front(x);
+    }
+
+    ElementoPila* pop() {
+        ElementoPila* x = *lista.begin();
+        lista.erase(lista.begin());
+        return x;
+    }
+
+    ElementoPila* top() {
+        return *lista.begin();
+    }
+
+    void muestra() const {
+        list<ElementoPila*>::const_iterator it;
+        ElementoPila* x;
+        cout << "Pila: ";
+
+        for (it = lista.begin(); it != lista.end(); it++) {
+            x = *it;
+            x->muestra();
+        }
+        cout << endl;
+    }
+};
+
+class Terminal : public ElementoPila {
+public:
+    void muestra() const override {
+        cout << "Terminal" << endl;
+    }
+};
+
+class NoTerminal : public ElementoPila {
+public:
+    void muestra() const override {
+        cout << "No Terminal" << endl;
+    }
+};
+
+class Estado : public ElementoPila {
+public:
+    void muestra() const override {
+        cout << "Estado" << endl;
+    }
+};
+
+int main() {
+    Pila pila;
+    ElementoPila* elemento;
+
+    elemento = new Licenciatura("345678", "Computacion", 200);
+    pila.push(elemento);
+
+    pila.push(new Bachillerato("456789", "Preparatoria 12"));
+    pila.push(new Licenciatura("456789", "Informatica", 50));
+    pila.push(new Terminal());
+    pila.push(new NoTerminal());
+    pila.push(new Estado());
+
+    pila.muestra();
+
+    cout << "*********************************" << endl;
+
+    pila.pop();
+    pila.muestra();
+
+    return 0;
+}
